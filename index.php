@@ -1,6 +1,6 @@
 <?php
 require_once('functions/functions.php');
-require_once "functions/crud.php";
+require_once ("functions/crud.php");
 $server = 'localhost';
 $userName = "root";
 $pwd = "";
@@ -59,3 +59,13 @@ if ($conn) {
         </div>
     </div>
 </nav>
+
+<form method="post">
+    <label>Username : </label>
+    <input type="text" id="username" class="form-input" require></br>
+    <label>Email : </label>
+    <input type="email" id="email" class="form-input" require></br>
+    <label>Password : </label>
+    <input type="password" id="password" class="form-input" require></br>
+    <input type="button" value="Enregistrer">
+</form>
