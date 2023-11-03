@@ -1,75 +1,53 @@
 <?php
 
-function showData($title, $data)
+
+function signupValidation($data)
 {
-    echo "</br></br><h2>" . $title . "</h2>";
-    var_dump($data);
+    $isValide = true;
+    //username >1 caractere
+    $error_username = "";
+    if (strlen($data['username']) < 2) {
+        $isValide = false;
+        $error_username = "Votre nom d'utilisateur est trop court. il doit avoir plus de 1 caractere";
+    }
+
+    //email regex pour email
+    $error_email = "";
+    //password min 8 max 16
+    $error_pwd = "";
+    $validationData = pwdLengthValidation($data['password']);
+    if (!$validationData['isValid']) {
+        $error_pwd = $validationData['msg'];
+        $isValide = $validationData['isValid'];
+    }
+
+
+
+    return [
+        "isValid" => $isValide,
+        "error_username" => $error_username,
+        "error_email" => $error_email,
+        "error_pwd" => $error_pwd,
+    ];
 }
 
-function selectUserByIdIndex($id)
+function pwdLengthValidation($pwd)
 {
-    // récupérer une ligne dans user
-    global $conn;
-    $result = mysqli_query($conn, "SELECT * FROM user WHERE id = " . $id);
-
-    // avec fetch row : tableau indexé
-    $data = mysqli_fetch_row($result);
-
-    return $data;
-}
-
-function selectUserByIdAssoc($id)
-{
-    global $conn;
-    $result = mysqli_query($conn, "SELECT * FROM user WHERE id = " . $id);
-
-    // avec fetch row : tableau indexé
-    $data = mysqli_fetch_assoc($result);
-
-    return $data;
-}
-
-function getAllUsersAssoc()
-{
-    global $conn;
-    $result = mysqli_query($conn, "SELECT * FROM user");
-
-    $data = [];
-    $i = 0;
-    while ($rangeeData = mysqli_fetch_assoc($result)) {
-        $data[$i] = $rangeeData;
-        $i++;
-    };
-
-    /* $imax = mysqli_num_rows($result);
-
-    for ($i = 0; $i < $imax; $i++) {
-        $rangeeData = mysqli_fetch_assoc($result);
-        $data[$i] = $rangeeData;
-    } */
-
-    return $data;
-}
-
-
-function getAllUsersIndex()
-{
-    global $conn;
-    $result = mysqli_query($conn, "SELECT * FROM user");
-
-    $data = [];
-    $i = 0;
-    while ($rangeeData = mysqli_fetch_row($result)) {
-        $data[$i] = $rangeeData;
-        $i++;
-    };
-
-    /* $imax = mysqli_num_rows($result);
-
-    for ($i = 0; $i < $imax; $i++) {
-        $rangeeData = mysqli_fetch_row($result);
-        $data[$i] = $rangeeData;
-    } */
-
-    return $data;
+    $length = strlen($pwd);
+    $responses = [
+        'isValid' => true,
+        'msg' => ''
+    ];
+    if ($length < 8) {
+        $responses = [
+            'isValid' => false,
+            'msg' => 'Votre mot de passe est trop court. Doit etre superieur a 8 caracteres',
+        ];
+    } elseif ($length > 16) {
+        $responses = [
+            'isValid' => false,
+            'msg' => 'Votre mot de passe est trop long. Doit etre inferieur a 16 caracteres'
+        ];
+    }
+    return $responses;
 }
