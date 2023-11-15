@@ -8,7 +8,7 @@ Je suis sur ma page d'enregistrement
     <label for="username">Nom d'utilisateur</label>
     <input type="text" id="username" name="username"></br>
     <label for="email">Courriel</label>
-    <input type="email" id="email" name="email"></br>
+    <input type="email" id="text" name="email"></br>
     <label for="password">Mot de passe</label>
     <input type="password" id="password" name="password"></br>
     <button type="submit">S'enregistrer</button>
