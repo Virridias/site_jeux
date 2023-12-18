@@ -97,3 +97,51 @@ function pwdLenghtValidation($pwd)
         'msg' => ''
     ];
 }
+
+
+function validationLoginUser($username, $password) {
+    global $conn;
+
+    // Requête préparée pour éviter les injections SQL
+    $sql = "SELECT * FROM user WHERE username = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, "s", $username);
+        mysqli_stmt_execute($stmt);
+
+        $result = mysqli_stmt_get_result($stmt);
+
+        if ($result->num_rows > 0) {
+            $row = mysqli_fetch_assoc($result);
+
+            if ($password == $row['password']) {
+               
+                $token = bin2hex(random_bytes(32));
+
+                // Stocker le token dans la base de données
+                $updateTokenQuery = "UPDATE user SET token = ? WHERE id = ?";
+                $updateTokenStmt = mysqli_prepare($conn, $updateTokenQuery);
+
+                if ($updateTokenStmt) {
+                    $userId = $row['id'];
+                    mysqli_stmt_bind_param($updateTokenStmt, "si", $token, $userId);
+                    mysqli_stmt_execute($updateTokenStmt);
+                    mysqli_stmt_close($updateTokenStmt);
+                }
+
+                return $token;
+            } else {
+                // Mot de passe incorrect
+                return false;
+            }
+        } else {
+            // Utilisateur non trouvé
+            return false;
+        }
+
+        mysqli_stmt_close($stmt);
+    } else {
+        die("Erreur de préparation de la requête: " . mysqli_error($conn));
+    }
+}
