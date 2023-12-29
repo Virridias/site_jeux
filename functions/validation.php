@@ -116,21 +116,47 @@ function validationLoginUser($username, $password) {
             $row = mysqli_fetch_assoc($result);
 
             if ($password == $row['password']) {
-               
-                $token = bin2hex(random_bytes(32));
+                // Vérifier si l'utilisateur est un administrateur
+                if ($row['role_id'] == 1) {
+                    $token = bin2hex(random_bytes(32));
 
-                // Stocker le token dans la base de données
-                $updateTokenQuery = "UPDATE user SET token = ? WHERE id = ?";
-                $updateTokenStmt = mysqli_prepare($conn, $updateTokenQuery);
+                    // Stocker le token dans la base de données
+                    $updateTokenQuery = "UPDATE user SET token = ? WHERE id = ?";
+                    $updateTokenStmt = mysqli_prepare($conn, $updateTokenQuery);
 
-                if ($updateTokenStmt) {
-                    $userId = $row['id'];
-                    mysqli_stmt_bind_param($updateTokenStmt, "si", $token, $userId);
-                    mysqli_stmt_execute($updateTokenStmt);
-                    mysqli_stmt_close($updateTokenStmt);
+                    if ($updateTokenStmt) {
+                        $userId = $row['id'];
+                        mysqli_stmt_bind_param($updateTokenStmt, "si", $token, $userId);
+                        mysqli_stmt_execute($updateTokenStmt);
+                        mysqli_stmt_close($updateTokenStmt);
+
+                        // Rediriger vers adminindex.php
+                        header('Location: adminindex.php');
+                        exit();
+                    } else {
+                        die("Erreur de préparation de la requête: " . mysqli_error($conn));
+                    }
+                } else {
+                    // L'utilisateur n'est pas un administrateur
+                    $token = bin2hex(random_bytes(32));
+
+                    // Stocker le token dans la base de données
+                    $updateTokenQuery = "UPDATE user SET token = ? WHERE id = ?";
+                    $updateTokenStmt = mysqli_prepare($conn, $updateTokenQuery);
+
+                    if ($updateTokenStmt) {
+                        $userId = $row['id'];
+                        mysqli_stmt_bind_param($updateTokenStmt, "si", $token, $userId);
+                        mysqli_stmt_execute($updateTokenStmt);
+                        mysqli_stmt_close($updateTokenStmt);
+
+                        // Rediriger vers indexUser.php
+                        header('Location: indexUser.php');
+                        exit();
+                    } else {
+                        die("Erreur de préparation de la requête: " . mysqli_error($conn));
+                    }
                 }
-
-                return $token;
             } else {
                 // Mot de passe incorrect
                 return false;
